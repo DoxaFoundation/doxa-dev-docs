@@ -1,0 +1,60 @@
+baseURL = "https://docs.doxa.org"
+languageCode = "en-us"
+title = "Doxa Developer Documentation"
+theme = "docsy"
+
+[params]
+  description = "Complete documentation for Doxa developers"
+  github_repo = "https://github.com/doxa-fi/core"
+  github_branch = "main"
+  github_subdir = "docs"
+  github_editlink = "https://github.com/doxa-fi/core/edit/main/docs/"
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "Home"
+    url = "/"
+    weight = -100
+  [[menu.main]]
+    identifier = "getting-started"
+    name = "Getting Started"
+    url = "/docs/getting-started/"
+    weight = 10
+  [[menu.main]]
+    identifier = "core-concepts"
+    name = "Core Concepts"
+    url = "/docs/core-concepts/"
+    weight = 20
+  [[menu.main]]
+    identifier = "api-reference"
+    name = "API Reference"
+    url = "/docs/api-reference/"
+    weight = 30
+  [[menu.main]]
+    identifier = "guides"
+    name = "Guides"
+    url = "/docs/guides/"
+    weight = 40
+  [[menu.main]]
+    identifier = "troubleshooting"
+    name = "Troubleshooting"
+    url = "/docs/troubleshooting/"
+    weight = 50
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineAnchors = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = false
+    style = "monokai"
+    tabWidth = 4

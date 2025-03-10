@@ -1,0 +1,13 @@
+{
+  "canisters": {
+    "sci_archive": {
+      "type": "assets",
+      "source": [
+        "public"
+      ],
+      "frontend": {
+        "entrypoint": "public/index.html"
+      }
+    }
+  }
+}
