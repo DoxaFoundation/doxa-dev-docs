@@ -9,6 +9,7 @@ theme = "docsy"
   github_branch = "main"
   github_subdir = "docs"
   github_editlink = "https://github.com/doxa-fi/core/edit/main/docs/"
+  ui.mermaid.enable = false
 
 [menu]
   [[menu.main]]

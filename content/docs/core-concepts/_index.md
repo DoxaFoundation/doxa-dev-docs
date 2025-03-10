@@ -17,20 +17,13 @@ This section covers the fundamental concepts you need to understand when buildin
 
 ## Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant DApp as DApp
-    participant NFID as NFID
-    participant User as User
-    participant Canister as Canister
-
-    Dev->>DApp: Initiate auth
-    DApp->>NFID: Redirect auth request
-    NFID->>User: Biometric auth
-    User->>NFID: Approve
-    NFID->>DApp: Return principal ID
-    DApp->>Canister: Call with auth header
+```
+Developer -> DApp: Initiate auth
+DApp -> NFID: Redirect auth request
+NFID -> User: Biometric auth
+User -> NFID: Approve
+NFID -> DApp: Return principal ID
+DApp -> Canister: Call with auth header
 ```
 
 ## Canisters

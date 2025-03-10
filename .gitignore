@@ -12,6 +12,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
 # OS generated files
 .DS_Store
@@ -38,6 +39,24 @@ Thumbs.db
 .dfx/
 static/css/
 static/js/
+
+# Docsy theme specific
+themes/docsy/node_modules/
+themes/docsy/package-lock.json
+themes/docsy/.npm/
+themes/docsy/assets/vendor/
+themes/docsy/go.mod
+themes/docsy/go.sum
+themes/docsy/CHANGELOG.md
+themes/docsy/CONTRIBUTING.md
+themes/docsy/Dockerfile
+themes/docsy/LICENSE
+themes/docsy/README.md
+themes/docsy/docker-compose.yaml
+themes/docsy/netlify.toml
+themes/docsy/package.json
+themes/docsy/postcss.config.js
+themes/docsy/*.zip
 
 # Temporary files
 *.log
