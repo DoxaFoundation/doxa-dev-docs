@@ -1,17 +1,111 @@
 <footer class="td-footer row d-print-none">
   <div class="container-fluid">
     <div class="row mx-md-2">
-      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
-        {{ partial "footer/left.html"  . }}
+      <div class="td-footer__left col-6 col-sm-3 order-sm-1">
+        <h5>About Us</h5>
+        <p>Doxa is a multi-stablecoin platform built on the Internet Computer (IC). Our platform enables seamless
+          integration and amazing applications.</p>
       </div>
-      {{- /* Trim WS */ -}}
-      <div class="td-footer__right col-6 col-sm-4 order-sm-3">
-        {{ partial "footer/right.html"  . }}
+      <div class="td-footer__center col-6 col-sm-3 order-sm-2">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="/docs/getting-started">Getting Started</a></li>
+          <li><a href="/docs/core-concepts">Core Concepts</a></li>
+          <li><a href="/docs/api-reference">API Reference</a></li>
+          <li><a href="/docs/guides">Guides</a></li>
+        </ul>
       </div>
-      {{- /* Trim WS */ -}}
-      <div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
-        {{ partial "footer/center.html"  . }}
+      <div class="td-footer__center col-6 col-sm-3 order-sm-3">
+        <h5>Contact Us</h5>
+        <ul class="list-unstyled">
+          <li><i class="fas fa-envelope"></i> <a href="mailto:contact@doxa.com">contact@doxa.com</a></li>
+          <li><i class="fas fa-map-marker-alt"></i> Location: Global</li>
+        </ul>
+      </div>
+      <div class="td-footer__right col-6 col-sm-3 order-sm-4">
+        <h5>Follow Us</h5>
+        <ul class="list-inline social-buttons">
+          <li class="list-inline-item">
+            <a href="https://twitter.com/doxa" target="_blank">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://github.com/doxa" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://discord.gg/doxa" target="_blank">
+              <i class="fab fa-discord"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://t.me/doxa" target="_blank">
+              <i class="fab fa-telegram"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row mx-md-2">
+      <div class="col-12 text-center py-4">
+        <hr>
+        {{ partial "footer/copyright.html" . }}
       </div>
     </div>
   </div>
 </footer>
+
+<style>
+  .td-footer {
+    background-color: #2C3E50;
+    color: #ffffff;
+    padding: 50px 0 20px;
+  }
+
+  .td-footer h5 {
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .td-footer ul li {
+    margin-bottom: 10px;
+  }
+
+  .td-footer a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .td-footer a:hover {
+    color: #3498DB;
+  }
+
+  .social-buttons {
+    margin-top: 15px;
+  }
+
+  .social-buttons li a {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #3498DB;
+    text-align: center;
+    line-height: 35px;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .social-buttons li a:hover {
+    background-color: #2980B9;
+    transform: translateY(-3px);
+  }
+
+  .td-footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+  }
+</style>
