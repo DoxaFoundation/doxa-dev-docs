@@ -5,3 +5,43 @@ Nothing defined here. The Hugo project that uses this theme can override Bootstr
 assets/scss/_styles_project.scss
 
 */
+
+/*
+Add custom styles here
+*/
+
+// Code block styling
+pre {
+  background-color: #f8f9fa;
+  border: 1px solid #eaecef;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.language-motoko {
+  color: #24292e;
+}
+
+// Syntax highlighting
+.hljs-keyword {
+  color: #d73a49;
+}
+
+.hljs-string {
+  color: #032f62;
+}
+
+.hljs-comment {
+  color: #6a737d;
+}
+
+.hljs-number {
+  color: #005cc5;
+}
