@@ -15,21 +15,24 @@ Doxa is a multi-stablecoin platform built on the Internet Computer (IC). This do
 - [Guides](/docs/guides)
 - [Troubleshooting](/docs/troubleshooting)
 
+## Documentation Sections
+
+### Core Protocol
+- [Key Components](/docs/key-components)
+- [Pool Operations](/docs/pool-operations)
+- [Staking Integration](/docs/staking-integration) 
+- [USDx Token Integration](/docs/usdx-token-integration)
+- [Liquidity Management](/docs/liquidity-management)
+- [Fee Collection](/docs/fee-collection)
+- [Transaction Monitoring](/docs/transaction-monitoring)
+- [Statistics and Data](/docs/statistics)
+
 ## Platform Stack
 
 - **Blockchain**: Internet Computer (IC) Mainnet
 - **Smart Contracts**: Motoko Canisters
 - **Frontend**: SvelteKit + IC AgentJS
 - **Authentication**: Internet Identity & NFID
-
-## Key Components
-
-```motoko
-module Constants {
-  public let DOXA_CANISTER_ID : Text = "xeka7-7iaaa-...";
-  public let CYCLE_FEE : Nat = 10_000; // 0.00001 XDR
-}
-```
 
 ## Getting Started
 

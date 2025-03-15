@@ -28,6 +28,53 @@ theme = "docsy"
     url = "/docs/core-concepts/"
     weight = 20
   [[menu.main]]
+    identifier = "protocol-integration"
+    name = "Protocol Integration"
+    url = "/docs/integration-guide/"
+    weight = 25
+  [[menu.main]]
+    identifier = "pool-operations"
+    name = "Pool Operations"
+    url = "/docs/pool-operations/"
+    parent = "protocol-integration"
+    weight = 1
+  [[menu.main]]
+    identifier = "staking-integration"
+    name = "Staking Integration" 
+    url = "/docs/staking-integration/"
+    parent = "protocol-integration"
+    weight = 2
+  [[menu.main]]
+    identifier = "usdx-token-integration"
+    name = "USDx Token Integration"
+    url = "/docs/usdx-token-integration/"
+    parent = "protocol-integration"
+    weight = 3
+  [[menu.main]]
+    identifier = "liquidity-management"
+    name = "Liquidity Management"
+    url = "/docs/liquidity-management/"
+    parent = "protocol-integration"
+    weight = 4
+  [[menu.main]]
+    identifier = "fee-collection"
+    name = "Fee Collection"
+    url = "/docs/fee-collection/"
+    parent = "protocol-integration"
+    weight = 5
+  [[menu.main]]
+    identifier = "transaction-monitoring"
+    name = "Transaction Monitoring"
+    url = "/docs/transaction-monitoring/"
+    parent = "protocol-integration"
+    weight = 6
+  [[menu.main]]
+    identifier = "statistics-data"
+    name = "Statistics & Data"
+    url = "/docs/statistics-data/"
+    parent = "protocol-integration"
+    weight = 7
+  [[menu.main]]
     identifier = "api-reference"
     name = "API Reference"
     url = "/docs/api-reference/"
