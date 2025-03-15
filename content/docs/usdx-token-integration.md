@@ -1,6 +1,11 @@
-# USDx Token Integration
+---
+title: "USDx Token Integration"
+linkTitle: "USDx Token Integration"
+weight: 4
+description: "Guide for integrating with the USDx stablecoin"
+---
 
-This guide explains how to integrate with the USDx stablecoin token on the Internet Computer.
+This guide explains how to integrate with the USDx stablecoin in the Doxa Protocol.
 
 ## Overview
 

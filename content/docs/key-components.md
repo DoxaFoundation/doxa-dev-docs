@@ -1,6 +1,11 @@
-# Key Components
+---
+title: "Key Components"
+linkTitle: "Key Components"
+weight: 1
+description: "Overview of core components in the Doxa Protocol"
+---
 
-This section provides a detailed overview of the core components that make up the Doxa Protocol.
+The Doxa Protocol consists of several fundamental building blocks that work together to create a robust stablecoin system. This section provides a detailed explanation of these core components and their interactions.
 
 ## Core System Architecture
 

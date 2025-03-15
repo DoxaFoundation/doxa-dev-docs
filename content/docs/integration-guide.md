@@ -1,3 +1,12 @@
+---
+title: "Integration Guide"
+linkTitle: "Integration Guide"
+weight: 1
+description: "Guide for integrating with the Doxa Protocol"
+---
+
+This guide provides a comprehensive overview of integrating with the Doxa Protocol.
+
 # Doxa Protocol Integration Guide
 
 This document is intended for developers who want to understand and integrate with the Doxa Protocol. Before reading this document, you need:

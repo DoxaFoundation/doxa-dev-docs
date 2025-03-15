@@ -1,6 +1,11 @@
-# Fee Collection
+---
+title: "Fee Collection"
+linkTitle: "Fee Collection"
+weight: 5
+description: "Guide for fee structure and collection in the Doxa Protocol"
+---
 
-This guide explains the fee structure and collection mechanism in the Doxa Protocol.
+This guide explains the fee structure and collection process in the Doxa Protocol.
 
 ## Overview
 

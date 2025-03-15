@@ -1,3 +1,10 @@
+---
+title: "Staking Integration"
+linkTitle: "Staking Integration"
+weight: 3
+description: "Guide for integrating with Doxa Protocol's staking system"
+---
+
 # Staking Integration
 
 This guide covers the staking mechanisms in the Doxa Protocol.

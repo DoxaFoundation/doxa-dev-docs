@@ -1,4 +1,9 @@
-# Pool Operations
+---
+title: "Pool Operations"
+linkTitle: "Pool Operations"
+weight: 1
+description: "Guide for interacting with liquidity pools in the Doxa Protocol"
+---
 
 This guide explains how to interact with liquidity pools in the Doxa Protocol.
 

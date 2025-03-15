@@ -1,6 +1,11 @@
-# Statistics and Data
+---
+title: "Statistics & Data"
+linkTitle: "Statistics & Data"
+weight: 7
+description: "Guide for accessing and analyzing protocol statistics"
+---
 
-This guide explains how to access and analyze statistical data from the Doxa Protocol.
+This guide explains how to access and analyze statistics in the Doxa Protocol.
 
 ## Overview
 

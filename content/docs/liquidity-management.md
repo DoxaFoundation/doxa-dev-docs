@@ -1,4 +1,9 @@
-# Liquidity Management
+---
+title: "Liquidity Management"
+linkTitle: "Liquidity Management"
+weight: 2
+description: "Guide for managing liquidity positions in the Doxa Protocol"
+---
 
 This guide explains how to manage liquidity positions in the Doxa Protocol.
 

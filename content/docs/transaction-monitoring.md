@@ -1,4 +1,9 @@
-# Transaction Monitoring
+---
+title: "Transaction Monitoring"
+linkTitle: "Transaction Monitoring"
+weight: 6
+description: "Guide for monitoring transactions in the Doxa Protocol"
+---
 
 This guide explains how to monitor and track transactions in the Doxa Protocol.
 
