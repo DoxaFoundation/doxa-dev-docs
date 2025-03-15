@@ -24,8 +24,8 @@ sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 2. Clone the Doxa repository:
 
 ```bash
-git clone https://github.com/doxa-fi/core
-cd core
+git clone https://github.com/DoxaFoundation/doxa-v3
+cd doxa-v3
 ```
 
 3. Install dependencies:
@@ -71,6 +71,23 @@ public shared(msg) func create_pool(
   Debug.print("Pool created: " # debug_show(pool));
 };
 ```
+
+## Additional Learning Resources
+
+### Internet Computer Development
+- [Official Internet Computer Documentation](https://internetcomputer.org/docs/home) - Comprehensive guides for building on IC
+- [IC Developer Portal](https://internetcomputer.org/docs/home) - SDK guides, tutorials, and sample projects
+- [Chain Fusion Documentation](https://internetcomputer.org/docs/home) - Learn about cross-chain integrations
+
+### Motoko Programming
+- [The Motoko Programming Language Book](https://motoko-book.dev/) - Complete guide to Motoko
+- [Motoko Base Library](https://motoko-book.dev/) - Standard library documentation
+- [Motoko by Example](https://motoko-book.dev/) - Practical code examples
+
+### Canister Development
+- [Canister Development Cycle](https://internetcomputer.org/docs/home) - Understanding canister lifecycle
+- [Canister Best Practices](https://internetcomputer.org/docs/home) - Security and optimization tips
+- [Deployment Guide](https://internetcomputer.org/docs/home) - Production deployment instructions
 
 ## Next Steps
 
