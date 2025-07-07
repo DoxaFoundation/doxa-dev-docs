@@ -1,252 +1,137 @@
 ---
 title: "Pool Operations"
 linkTitle: "Pool Operations"
-weight: 1
-description: "Guide for interacting with liquidity pools in the Doxa Protocol"
+weight: 5
+description: "Guide for pool operations in the Doxa Protocol"
 ---
 
-This guide explains how to interact with liquidity pools in the Doxa Protocol.
+# Pool Operations
 
 ## Overview
 
-Doxa Protocol uses an Automated Market Maker (AMM) model similar to Uniswap v3, with concentrated liquidity positions and multiple fee tiers.
+Doxa Protocol implements AMM-style trading pools for token swaps. The system supports DUSD trading pairs with automatic price calculation.
 
-## Pool Types
+## Supported Tokens
 
-### Standard Pools
+Based on the actual implementation:
+- **DUSD**: Primary stablecoin (6 decimals)
+- **ckUSDC**: Collateral token (6 decimals)
+- **ICP**: Internet Computer token
+- **Other ICRC-1 tokens**: As configured
+
+## Basic Swap Operations
+
+### Get Pool Price
+
 ```motoko
-type PoolType = {
-    #Standard: {
-        fee: Fee;
-        tickSpacing: Nat;
-    };
-    #Stable: {
-        fee: Fee;
-        amplifier: Nat;
-    };
+// Get current price between tokens
+let price = await swapCanister.getInitialPrice(token0Id, token1Id);
+
+// Check token decimals
+let decimals0 = await swapCanister.getDecimals(token0Id);
+let decimals1 = await swapCanister.getDecimals(token1Id);
+```
+
+### Execute Swap
+
+```motoko
+// Basic swap function
+let swapResult = await swapCanister.swap({
+    tokenIn = "irorr-5aaaa-aaaak-qddsq-cai"; // DUSD
+    tokenOut = "xevnm-gaaaa-aaaar-qafnq-cai"; // ckUSDC
+    amountIn = 1_000_000; // 1 DUSD
+    minimumAmountOut = 950_000; // Minimum 0.95 ckUSDC
+    deadline = Time.now() + 300_000_000_000; // 5 minutes
+});
+```
+
+## Pool Information
+
+### Pool Data Structure
+
+```motoko
+type PoolData = {
+    token0: Text;
+    token1: Text;
+    reserve0: Nat;
+    reserve1: Nat;
+    totalSupply: Nat;
+    fee: Nat; // Fee in basis points
 };
 ```
 
-### Fee Tiers
-| Fee Tier | Description | Best For |
-|----------|-------------|----------|
-| 0.01% | Ultra low fee | Stable pairs |
-| 0.05% | Low fee | Correlated pairs |
-| 0.3% | Medium fee | Most pairs |
-| 1% | High fee | Exotic pairs |
+### Get Pool Details
 
-## Pool Creation
-
-### Create New Pool
 ```motoko
-public shared func createPool(
-    token0: Principal,
-    token1: Principal,
-    fee: Fee,
-    sqrtPriceX96: Nat,
-    tickSpacing: Nat
-) : async Result<Principal, Text>
+// Get pool information
+let poolInfo = await swapCanister.getCreatedPoolData(poolId);
+
+// Check pool exists and is active
+let poolExists = await swapCanister.poolExists(token0Id, token1Id);
 ```
 
-### Initialize Pool
+## Fee Structure
+
+- **Standard Fee**: 0.3% (30 basis points)
+- **Stable Pairs**: 0.05% (5 basis points)  
+- **Exotic Pairs**: 1% (100 basis points)
+
+## Price Calculation
+
+The swap uses automated market maker formulas:
+
 ```motoko
-public shared func initializePool(
-    poolId: Principal,
-    sqrtPriceX96: Nat
-) : async Result<(), Text>
-```
-
-## Liquidity Management
-
-### Add Liquidity
-```motoko
-public shared func addLiquidity(
-    params: {
-        poolId: Principal;
-        recipient: Principal;
-        tickLower: Int;
-        tickUpper: Int;
-        amount0Desired: Nat;
-        amount1Desired: Nat;
-        amount0Min: Nat;
-        amount1Min: Nat;
-        deadline: Int;
-    }
-) : async Result<AddLiquidityResult, Text>
-```
-
-### Remove Liquidity
-```motoko
-public shared func removeLiquidity(
-    params: {
-        poolId: Principal;
-        positionId: Nat;
-        amount0Min: Nat;
-        amount1Min: Nat;
-        deadline: Int;
-    }
-) : async Result<RemoveLiquidityResult, Text>
-```
-
-## Trading Operations
-
-### Swap Tokens
-```motoko
-public shared func swap(
-    params: {
-        poolId: Principal;
-        recipient: Principal;
-        zeroForOne: Bool;
-        amountSpecified: Int;
-        sqrtPriceLimitX96: Nat;
-        deadline: Int;
-    }
-) : async Result<SwapResult, Text>
-```
-
-### Quote Price
-```motoko
-public query func quotePrice(
-    poolId: Principal,
-    amountIn: Nat,
-    zeroForOne: Bool
-) : async Result<QuoteResult, Text>
-```
-
-## Position Management
-
-### Get Position Info
-```motoko
-public query func getPosition(
-    positionId: Nat
-) : async ?Position
-
-type Position = {
-    owner: Principal;
-    poolId: Principal;
-    tickLower: Int;
-    tickUpper: Int;
-    liquidity: Nat;
-    feeGrowthInside0LastX128: Nat;
-    feeGrowthInside1LastX128: Nat;
-    tokensOwed0: Nat;
-    tokensOwed1: Nat;
-};
-```
-
-### Collect Fees
-```motoko
-public shared func collectFees(
-    positionId: Nat
-) : async Result<{
-    amount0: Nat;
-    amount1: Nat;
-}, Text>
-```
-
-## Pool Analytics
-
-### Get Pool State
-```motoko
-public query func getPoolState(
-    poolId: Principal
-) : async PoolState
-
-type PoolState = {
-    liquidity: Nat;
-    sqrtPriceX96: Nat;
-    tick: Int;
-    observationIndex: Nat;
-    observationCardinality: Nat;
-    feeProtocol: Nat;
-    unlocked: Bool;
-};
-```
-
-### Get Pool Statistics
-```motoko
-public query func getPoolStats(
-    poolId: Principal
-) : async PoolStats
-
-type PoolStats = {
-    tvl: Nat;
-    volume24h: Nat;
-    fees24h: Nat;
-    apy: Float;
-};
-```
-
-## Oracle Functions
-
-### Get Time-Weighted Average Price (TWAP)
-```motoko
-public query func getTWAP(
-    poolId: Principal,
-    secondsAgo: Nat
-) : async Result<Nat, Text>
-```
-
-### Get Price Observation
-```motoko
-public query func getObservation(
-    poolId: Principal,
-    index: Nat
-) : async ?Observation
+// Constant product formula: x * y = k
+// Price impact based on reserve ratios
+// Slippage protection through minimum output amounts
 ```
 
 ## Error Handling
 
-Common pool operation errors:
 ```motoko
-type PoolError = variant {
-    InsufficientLiquidity;
-    InvalidPrice;
-    InvalidTick;
-    LiquidityOverflow;
-    NotFound;
-    PriceLimitReached;
-    SlippageExceeded;
-    TickOutOfRange;
-    Unauthorized;
+type SwapError = variant {
+    #InsufficientBalance;
+    #InsufficientLiquidity;
+    #ExcessiveSlippage;
+    #DeadlineExceeded;
+    #InvalidToken;
+    #PoolNotFound;
 };
 ```
 
 ## Best Practices
 
-### 1. Price Impact
-- Calculate price impact before trades
-- Set appropriate slippage tolerance
-- Use price limits for large trades
+1. **Slippage Protection**: Always set reasonable minimum output amounts
+2. **Deadline Management**: Use appropriate transaction deadlines
+3. **Token Validation**: Verify token addresses before swapping
+4. **Balance Checks**: Ensure sufficient balance before attempting swaps
+5. **Error Handling**: Implement proper error handling for all scenarios
 
-### 2. Gas Optimization
-- Batch similar operations
-- Choose optimal fee tiers
-- Consider tick spacing
+## Integration Example
 
-### 3. Risk Management
-- Monitor position health
-- Set reasonable price ranges
-- Understand impermanent loss
+```motoko
+// Complete swap integration
+let user_balance = await DUSD.icrc1_balance_of({
+    owner = userPrincipal;
+    subaccount = null;
+});
 
-### 4. Integration Tips
-- Handle all error cases
-- Implement proper timeouts
-- Monitor pool state changes
-
-## Common Use Cases
-
-### 1. Market Making
-- Provide concentrated liquidity
-- Manage active ranges
-- Rebalance positions
-
-### 2. Trading
-- Execute swaps efficiently
-- Monitor price movements
-- Optimize trade paths
-
-### 3. Portfolio Management
-- Track positions
-- Collect fees regularly
-- Adjust ranges as needed 
+if (user_balance >= swapAmount) {
+    let swapResult = await performSwap(
+        tokenIn,
+        tokenOut, 
+        swapAmount,
+        minimumOut,
+        deadline
+    );
+    
+    switch (swapResult) {
+        case (#ok(outputAmount)) {
+            Debug.print("Swap successful: " # Nat.toText(outputAmount));
+        };
+        case (#err(error)) {
+            Debug.print("Swap failed: " # debug_show(error));
+        };
+    };
+};
+``` 

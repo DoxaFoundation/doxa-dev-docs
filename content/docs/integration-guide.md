@@ -18,86 +18,24 @@ This document is intended for developers who want to understand and integrate wi
 
 ## Navigation
 
-* [Pool Operations](#pool-operations)
+* [DUSD Token Integration](#dusd-token-integration)
 * [Staking Integration](#staking-integration)
-* [USDx Token Integration](#usdx-token-integration)
-* [Liquidity Management](#liquidity-management)
+* [Pool Operations](#pool-operations)
 * [Fee Collection](#fee-collection)
 * [Transaction Monitoring](#transaction-monitoring)
-* [Statistics and Data](#statistics-and-data)
 
-## Testing Environment
-
-### Canister IDs
+## Core Canister IDs
 
 | Component | Principal ID |
 |-----------|-------------|
-| USDx Token | irorr-5aaaa-aaaak-qddsq-cai |
-| USDx Index | modmy-byaaa-aaaag-qndgq-cai |
+| DUSD Token | irorr-5aaaa-aaaak-qddsq-cai |
+| DUSD Index | modmy-byaaa-aaaag-qndgq-cai |
 | Staking | mhahe-xqaaa-aaaag-qndha-cai |
-| CKUSDC Pool | iyn2n-liaaa-aaaak-qddta-cai |
-| Fee Collector | ieja4-4iaaa-aaaak-qddra-cai |
+| ckUSDC | xevnm-gaaaa-aaaar-qafnq-cai |
 
-## Core Features
+## DUSD Token Integration
 
-### 1. Pool Operations
-
-#### Creating a Pool
-```motoko
-public shared func create(
-    firstTokenId: Text, 
-    secondTokenId: Text
-) : async Result<SwapFactory.PoolData, Text>
-```
-
-Example:
-```motoko
-let poolArgs : CreatePoolArgs = {
-    fee = 3_000; // 0.3% fee
-    sqrtPriceX96 = Int.toText(sqrtPrice);
-    subnet = null;
-    token0 = { address = token0Id; standard = "ICRC2" };
-    token1 = { address = token1Id; standard = "ICRC2" };
-};
-```
-
-#### Adding Liquidity
-```motoko
-public shared func addLiquidity(
-    poolId: Principal,
-    amount0Desired: Nat,
-    amount1Desired: Nat
-) : async Result<Position, Text>
-```
-
-### 2. Staking Integration
-
-#### Initialize Stake
-```motoko
-// Stake tokens
-public shared ({ caller }) func stake(
-    amount: Nat,
-    duration: Nat
-) : async Result<StakeId, Text>
-```
-
-Configuration Parameters:
-```motoko
-MIN_LOCK_DURATION = 30 days
-MAX_LOCK_DURATION = 365 days
-MIN_STAKE_AMOUNT = 100 tokens
-```
-
-#### Harvest Rewards
-```motoko
-public shared ({ caller }) func harvestRewards(
-    stakeId: StakeId
-) : async Result<Nat, Text>
-```
-
-### 3. USDx Token Integration
-
-#### ICRC-1 Standard Methods
+### ICRC-1 Standard Methods
 ```motoko
 // Check balance
 icrc1_balance_of : shared query (Account) -> async Nat
@@ -109,79 +47,77 @@ icrc1_transfer : shared (TransferArg) -> async TransferResult
 icrc1_metadata : shared query () -> async [(Text, MetadataValue)]
 ```
 
-#### ICRC-2 Approval Methods
-```motoko
-// Approve spending
-icrc2_approve : shared (ApproveArgs) -> async ApproveResult
+### Token Specifications
+- **Decimals**: 6 (1 DUSD = 1,000,000 units)
+- **Symbol**: DUSD
+- **Name**: Doxa USD
+- **Standard**: ICRC-1 compliant
 
-// Check allowance
-icrc2_allowance : shared query (AllowanceArgs) -> async Allowance
+## Staking Integration
+
+### Initialize Stake
+```motoko
+public shared ({ caller }) func stake(
+    amount: Nat
+) : async Result<StakeId, Text> {
+    // Minimum stake: 10 DUSD (10,000,000 units)
+    // Lock duration: 30 days
+    // APY: 20% base rate
+}
 ```
 
-### 4. Fee Collection
-
-#### Fee Structure
+### Configuration Parameters
 ```motoko
-// Pool creation fee
-poolCreationFee : Nat = 100_000_000; // 1 ICP
-
-// Transaction approval fee
-approvalFee : Nat = 10_000; // 0.0001 ICP
+MIN_LOCK_DURATION = 30 days
+MIN_STAKE_AMOUNT = 10_000_000 // 10 DUSD
+BASE_APY = 20 // 20%
 ```
 
-#### Weekly Reward Distribution
+### Harvest Rewards
 ```motoko
-public shared ({ caller }) func weekly_reward_approval(
-    {
-        memo;
-        created_at_time;
-        amount;
-        expires_at
-    } : RewardApprovalArg
-) : async Result<Nat, RewardApprovalErr>
+public shared ({ caller }) func harvestRewards(
+    stakeId: StakeId
+) : async Result<Nat, Text>
 ```
 
-### 5. Transaction Monitoring
+## Pool Operations
 
-#### Get Transaction History
+### AMM Swaps
 ```motoko
-public query func get_account_transactions(
-    args: GetAccountTransactionsArgs
-) : async GetTransactionsResult
+public shared func swap(
+    tokenIn: Text,
+    tokenOut: Text,
+    amountIn: Nat
+) : async Result<Nat, Text>
 ```
 
-Response Structure:
+### Price Queries
 ```motoko
-type GetTransactions = {
-    balance : Tokens;
-    transactions : [TransactionWithId];
-    oldest_tx_id : ?BlockIndex;
-};
+public query func getPrice(
+    token0: Text,
+    token1: Text
+) : async Float
 ```
 
-### 6. Statistics and Data
+## Minting DUSD
 
-#### Pool Statistics
+### Notify Mint Function
 ```motoko
-public query func getPoolPrices() : async [{
-    name : Text;
-    price : Float;
-}]
+public shared ({ caller }) func notify_mint_with_ckusdc({
+    ckusdc_block_index : Nat;
+    minting_token : Text;
+}) : async Result<Nat, NotifyError>
 ```
 
-#### Position Information
-```motoko
-public func getPositionAmount() : async [{
-    name : Text;
-    amount0 : Int;
-    amount1 : Int;
-}]
-```
+### Process Flow
+1. Deposit ckUSDC to reserve account
+2. Call notify_mint_with_ckusdc with block index
+3. System validates ckUSDC transaction
+4. Mints equivalent DUSD tokens (1:1 ratio)
 
 ## Error Handling
 
-Common error types and their meanings:
-
+### Common Error Types
 ```motoko
 type TransferError = variant {
     BadFee : { expected_fee : Tokens };
@@ -191,26 +127,82 @@ type TransferError = variant {
     TemporarilyUnavailable;
     Duplicate : { duplicate_of : BlockIndex };
 };
+
+type NotifyError = variant {
+    InvalidTransaction : Text;
+    TransactionTooOld : Nat;
+    UnexpectedError : Text;
+};
 ```
 
 ## Best Practices
 
 ### 1. Transaction Safety
-- Always check return values
-- Handle all error variants
-- Implement proper timeouts
+- Always validate amounts before operations
+- Handle all error variants properly
+- Check minimum thresholds
 
-### 2. Gas Optimization
-- Batch transactions when possible
-- Use appropriate fee settings
-- Monitor gas consumption
+### 2. Gas Management
+- Monitor cycle costs
+- Implement retry mechanisms
+- Use appropriate timeouts
 
-### 3. Security
-- Validate all inputs
-- Implement proper access control
-- Use secure approval flows
+### 3. State Management
+- Cache frequently accessed data
+- Implement proper error recovery
+- Handle async call failures
 
-### 4. Rate Limiting
-- Implement cooldown periods
-- Monitor transaction frequency
-- Handle congestion gracefully 
+## Integration Examples
+
+### Basic DUSD Transfer
+```motoko
+let transferArg : TransferArg = {
+    amount = 1_000_000; // 1 DUSD
+    to = recipientAccount;
+    fee = ?10_000; // Standard fee
+    memo = null;
+    from_subaccount = null;
+    created_at_time = ?Nat64.fromIntWrap(Time.now());
+};
+
+let result = await DUSD.icrc1_transfer(transferArg);
+```
+
+### Stake DUSD Tokens
+```motoko
+// First approve the staking canister
+let approveArg : ApproveArgs = {
+    amount = 50_000_000; // 50 DUSD
+    spender = { owner = STAKING_CANISTER; subaccount = null };
+    fee = ?10_000;
+    memo = null;
+    from_subaccount = null;
+    created_at_time = ?Nat64.fromIntWrap(Time.now());
+    expires_at = null;
+};
+
+await DUSD.icrc2_approve(approveArg);
+
+// Then stake the tokens
+let stakeResult = await StakingCanister.stake(50_000_000);
+```
+
+## Rate Limits & Quotas
+
+- **Transfer Operations**: No explicit limits
+- **Query Calls**: 500 per second recommended
+- **Update Calls**: Consider cycle costs
+- **Staking Operations**: Once per lock period
+
+## Testing Guidelines
+
+### Local Development
+1. Deploy canisters locally using dfx
+2. Use test tokens for integration testing
+3. Validate all error scenarios
+
+### Mainnet Integration
+1. Start with small amounts
+2. Monitor transaction results
+3. Implement proper logging
+4. Have rollback procedures ready 

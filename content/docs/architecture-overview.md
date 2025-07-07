@@ -11,48 +11,82 @@ This document provides a comprehensive overview of the Doxa Protocol's system ar
 
 ### Core Components
 
-The Doxa Protocol consists of the following core components:
+The Doxa Protocol implements a simple yet robust stablecoin system with the following components:
 
-1. **Frontend Layer**
-   - SvelteKit application
-   - Internet Identity integration
-   - User interface components
+1. **DUSD Token System**
+   - ICRC-1 compliant stablecoin
+   - 1:1 backed by ckUSDC collateral
+   - 6 decimal precision (1 DUSD = 1,000,000 units)
 
-2. **Protocol Layer**
-   - USDx Token management
-   - Liquidity pool operations
-   - Staking system
-   - Price oracle integration
+2. **Stablecoin Minter**
+   - Handles ckUSDC deposits
+   - Validates collateral transactions
+   - Mints DUSD tokens 1:1 ratio
 
-3. **Infrastructure Layer**
-   - Internet Computer blockchain
-   - Canister smart contracts
-   - Cross-chain bridges
+3. **Staking System**
+   - 20% base APY staking rewards
+   - 30-day minimum lock period
+   - Bootstrap phase for early adopters
+
+4. **AMM Trading System**
+   - Token swaps and price discovery
+   - Liquidity provision capabilities
+   - Multi-token support
 
 ### Canister Architecture
-- USDx Token Canister
-- Pool Factory Canister
-- Staking Canister
-- Oracle Canister
-- Fee Collector Canister
+
+```motoko
+// Core Canisters
+DUSD_TOKEN: "irorr-5aaaa-aaaak-qddsq-cai"     // ICRC-1 token
+STAKING:    "mhahe-xqaaa-aaaag-qndha-cai"     // Staking rewards
+MINTER:     "[stablecoin-minter-canister]"    // ckUSDC -> DUSD
+SWAP:       "[swap-canister]"                 // AMM functionality
+```
 
 ## Data Flow
 
-### Transaction Flow
-1. User initiates transaction
-2. Authentication check
-3. Input validation
-4. State update
-5. Event emission
-6. Response generation
+### Minting Process
+1. User deposits ckUSDC to reserve account
+2. Minter validates ckUSDC transaction on ledger
+3. Equivalent DUSD tokens minted 1:1 ratio
+4. DUSD transferred to user account
 
-### Cross-Canister Communication
+### Staking Process
+1. User approves DUSD transfer to staking canister
+2. Stake position created with 30-day lock
+3. Rewards calculated at 20% base APY
+4. Bootstrap bonuses applied during early phase
+
+### Trading Process
+1. User initiates swap via AMM
+2. Price calculated based on liquidity pools
+3. Tokens exchanged with 0.3% trading fee
+4. Updated balances reflected on-chain
+
+## Inter-Canister Communication
+
 ```motoko
-actor {
-    public shared func intercanisterCall() : async Result<(), Text> {
-        let result = await otherCanister.someMethod();
-        // Handle result
-    }
+// Example: Minting DUSD
+actor StablecoinMinter {
+    let DUSD : Icrc.Self = actor("irorr-5aaaa-aaaak-qddsq-cai");
+    let ckUSDC : Icrc.Self = actor("xevnm-gaaaa-aaaar-qafnq-cai");
+    
+    public shared func notify_mint_with_ckusdc({
+        ckusdc_block_index : Nat;
+        minting_token : Text;
+    }) : async Result<Nat, NotifyError> {
+        // Validate ckUSDC transaction
+        let validation = await validateCkUsdcTransaction(ckusdc_block_index);
+        
+        // Mint equivalent DUSD
+        let result = await DUSD.icrc1_transfer({
+            amount = validation.amount;
+            to = validation.account;
+            // ... other parameters
+        });
+        
+        result;
+    };
 }
 ```
 
@@ -60,134 +94,114 @@ actor {
 
 ### Stable Storage
 ```motoko
-private stable var state: {
-    pools: [(Principal, Pool)];
-    stakes: [(Principal, Stake)];
-    balances: [(Principal, Nat)];
-}
-```
+// Staking canister state
+private stable var stakingPool = {
+    apy = 20;
+    totalStaked = 0;
+    minimumStake = 10_000_000; // 10 DUSD
+    lockDuration = 2_592_000_000_000_000; // 30 days in nanoseconds
+};
 
-### Memory Management
-- Garbage collection
-- State optimization
-- Memory limits
-
-## Protocol Modules
-
-### 1. Token Module
-- ICRC-1 compliance
-- Transfer logic
-- Balance tracking
-
-### 2. Pool Module
-- Pool creation
-- Liquidity management
-- Swap operations
-
-### 3. Staking Module
-- Stake creation
-- Reward distribution
-- Time-lock management
-
-### 4. Oracle Module
-- Price feeds
-- Data aggregation
-- Update frequency
-
-## Integration Points
-
-### External Systems
-- Internet Computer
-- Bitcoin network
-- Ethereum network
-- Other IC dapps
-
-### API Endpoints
-```motoko
-type API = {
-    swap: (SwapArgs) -> async SwapResult;
-    stake: (StakeArgs) -> async StakeResult;
-    provide: (PoolArgs) -> async PoolResult;
+// Minter canister state  
+private stable var reserveAccount : Account = {
+    owner = Principal.fromText("ckusdc-reserve-account");
+    subaccount = null;
 };
 ```
 
-## Scalability Design
-
-### Horizontal Scaling
-- Multiple pool canisters
-- Sharded state
-- Load balancing
-
-### Performance Optimization
-- Batch processing
-- Caching strategies
-- Query optimization
-
-## Upgrade Strategy
-
-### Canister Upgrades
-1. Version compatibility check
-2. State preservation
-3. Gradual rollout
-4. Rollback capability
-
-### Migration Process
-```motoko
-public shared({ caller }) func upgrade() : async () {
-    assert(isAdmin(caller));
-    // Migration logic
-}
-```
+### Memory Management
+- Efficient state serialization
+- Garbage collection optimization
+- Canister upgrade compatibility
 
 ## Security Architecture
 
+### Collateral Validation
+```motoko
+private func validateCkUsdcBlockForMint(
+    blockIndex : Nat,
+    caller : Principal,
+    token : Text
+) : async Result<(Nat, Account), NotifyError> {
+    // Get transaction from ckUSDC ledger
+    let transaction = await ckUSDC.get_transactions({
+        start = blockIndex;
+        length = 1;
+    });
+    
+    // Validate minimum amount (1 ckUSDC)
+    if (transfer.amount < 1_000_000) {
+        return #err(#InvalidTransaction("Below minimum deposit"));
+    };
+    
+    // Verify destination is reserve account
+    if (transfer.to != reserveAccount) {
+        return #err(#InvalidTransaction("Invalid destination"));
+    };
+    
+    #ok(transfer.amount, transfer.from);
+};
+```
+
 ### Access Control
-- Role-based permissions
-- Multi-sig requirements
-- Time-locks
+- Role-based permissions for admin functions
+- User authentication via Internet Identity
+- Time-locked operations for security
 
-### Data Protection
-- Encryption methods
-- Privacy considerations
-- Data integrity
+## Performance Characteristics
 
-## Monitoring & Metrics
+### Transaction Throughput
+- **Token Transfers**: ~2 second finality
+- **Staking Operations**: Single block confirmation
+- **Minting**: Depends on ckUSDC ledger validation
+- **Swaps**: Real-time price calculation
+
+### Scalability Design
+- Independent canister scaling
+- Optimized query functions
+- Efficient state management
+
+## Integration Points
+
+### ICRC-1 Compatibility
+```motoko
+// Standard token interface
+public query func icrc1_balance_of(account : Account) : async Nat
+public shared func icrc1_transfer(args : TransferArg) : async TransferResult
+public query func icrc1_metadata() : async [(Text, MetadataValue)]
+```
+
+### DApp Integration
+- Standard token interfaces
+- Query-based price feeds
+- Event notification system
+
+## Monitoring & Health
 
 ### System Metrics
-- Transaction volume
-- State size
-- Cycle consumption
-- Error rates
-
-### Health Checks
 ```motoko
-public query func health_check() : async {
-    uptime: Int;
-    memory: Nat;
-    cycles: Nat;
+public query func getSystemStats() : async {
+    totalDUSDSupply: Nat;
+    totalCkUSDCReserves: Nat;
+    activeStakes: Nat;
+    totalValueLocked: Nat;
 }
 ```
 
-## Deployment Architecture
-
-### Production Setup
-- Main network deployment
-- Staging environment
-- Development setup
-
-### Backup & Recovery
-- State backup procedures
-- Recovery mechanisms
-- Emergency protocols
+### Health Checks
+- Collateralization ratio monitoring
+- Canister cycle tracking
+- Transaction success rates
 
 ## Future Architecture
 
-### Planned Improvements
-1. Layer 2 scaling
-2. Cross-chain bridges
-3. Advanced oracle system
+### Planned Enhancements
+1. Multi-collateral support expansion
+2. Advanced staking reward mechanisms
+3. Cross-chain bridge integrations
+4. Enhanced AMM features
 
-### Research Areas
-- Zero-knowledge proofs
-- State compression
-- Parallel execution 
+### Scalability Considerations
+- Subnet deployment strategies
+- Load balancing mechanisms
+- State sharding possibilities 

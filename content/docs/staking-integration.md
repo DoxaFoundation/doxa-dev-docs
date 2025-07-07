@@ -5,124 +5,123 @@ weight: 3
 description: "Guide for integrating with Doxa Protocol's staking system"
 ---
 
-# Staking Integration
-
-This guide covers the staking mechanisms in the Doxa Protocol.
+# DUSD Staking Integration
 
 ## Overview
 
-Doxa Protocol offers flexible staking options with different durations and reward structures. Users can stake tokens to earn rewards and participate in protocol governance.
+Doxa Protocol offers DUSD staking with 20% base APY and a 30-day minimum lock period. The system includes bootstrap phase rewards for early participants.
 
-## Staking Configuration
+## Staking Parameters
 
-### Duration Parameters
 ```motoko
-MIN_LOCK_DURATION = 30 days
-MAX_LOCK_DURATION = 365 days
-MIN_STAKE_AMOUNT = 100 tokens
+// Core staking constants
+MIN_LOCK_DURATION: 2_592_000_000_000_000 nanoseconds (30 days)
+MIN_STAKE_AMOUNT: 10_000_000 units (10 DUSD)
+MAX_STAKE_PER_ADDRESS: 20_000_000_000 units (20,000 DUSD)
+BASE_APY: 20%
+TOKEN: DUSD (irorr-5aaaa-aaaak-qddsq-cai)
 ```
 
-### Reward Tiers
-| Duration | Weight | APY Range |
-|----------|--------|-----------|
-| 30 days  | 1x     | 3-5%      |
-| 90 days  | 2x     | 6-8%      |
-| 180 days | 3x     | 9-12%     |
-| 365 days | 4x     | 15-18%    |
+## Basic Staking
 
-## Staking Functions
+### Stake DUSD Tokens
 
-### Initialize Stake
 ```motoko
-public shared ({ caller }) func stake(
-    amount: Nat,
-    duration: Nat
-) : async Result<StakeId, Text>
-```
-
-#### Parameters
-- `amount`: Number of tokens to stake
-- `duration`: Staking period in days
-
-#### Example Usage
-```motoko
-let stakeResult = await Staking.stake({
-    amount = 1_000_000; // 1000 tokens
-    duration = 90; // 90 days
+// Stake 50 DUSD for 30 days
+let stakeResult = await doxaStaking.stakeTokens({
+    amount = 50_000_000; // 50 DUSD (6 decimals)
+    lockDuration = 2_592_000_000_000_000; // 30 days minimum
 });
+
+switch (stakeResult) {
+    case (#ok(stakeId)) {
+        Debug.print("Staked successfully, ID: " # stakeId);
+    };
+    case (#err(error)) {
+        Debug.print("Staking failed: " # error);
+    };
+};
 ```
 
-### Harvest Rewards
+### Check Staking Status
+
 ```motoko
-public shared ({ caller }) func harvestRewards(
-    stakeId: StakeId
-) : async Result<Nat, Text>
+// Get stake information
+let stakeInfo = await doxaStaking.getStakeInfo(stakeId);
+
+// Check available rewards
+let rewards = await doxaStaking.getRewards(userPrincipal);
+
+// Get pool information
+let poolInfo = await doxaStaking.getPoolInfo();
 ```
 
-### Check Stake Status
+### Claim Rewards
+
 ```motoko
-public query func getStakeInfo(
-    stakeId: StakeId
-) : async ?StakeInfo
+// Claim accumulated rewards
+let claimResult = await doxaStaking.claimRewards();
+
+switch (claimResult) {
+    case (#ok(amount)) {
+        Debug.print("Claimed " # Nat.toText(amount) # " DUSD rewards");
+    };
+    case (#err(error)) {
+        Debug.print("Claim failed: " # error);
+    };
+};
 ```
 
-## Reward Calculation
+## Unstaking
 
-### Weekly Rewards Formula
 ```motoko
-weeklyReward = (stakedAmount * weight * rewardRate) / totalStakedValue
+// Unstake after lock period expires
+let unstakeResult = await doxaStaking.unstake(stakeId);
+
+switch (unstakeResult) {
+    case (#ok(amount)) {
+        Debug.print("Unstaked " # Nat.toText(amount) # " DUSD");
+    };
+    case (#err(error)) {
+        Debug.print("Unstaking failed: " # error);
+    };
+};
 ```
 
-### APY Calculation
-```motoko
-effectiveAPY = baseRate * weightMultiplier * (1 + bonusMultiplier)
-```
+## Pool Configuration
 
-## Governance Integration
+The staking pool has the following settings:
 
-### Voting Power
 ```motoko
-votingPower = stakedAmount * stakeDuration / maxDuration
-```
-
-### Proposal Creation
-```motoko
-public shared ({ caller }) func createProposal(
-    proposal: ProposalData
-) : async Result<ProposalId, Text>
+Pool Details:
+- Name: "Doxa Dynamic Staking"
+- Staking Token: DUSD
+- Reward Token: DUSD
+- APY: 20%
+- Min Stake: 10 DUSD
+- Max Stake per Address: 20,000 DUSD
+- Lock Duration: 30 days minimum
+- Bootstrap Phase: Enhanced rewards for early stakers
 ```
 
 ## Error Handling
 
-Common staking errors:
 ```motoko
 type StakingError = variant {
-    InsufficientBalance;
-    InvalidDuration;
-    StakeNotFound;
-    RewardNotReady;
-    UnauthorizedCaller;
+    #InsufficientBalance;
+    #AmountTooLow;
+    #AmountTooHigh;
+    #StakeNotFound;
+    #StakeLocked;
+    #Unauthorized;
+    #PoolNotActive;
 };
 ```
 
 ## Best Practices
 
-1. **Stake Management**
-   - Monitor reward accrual
-   - Plan stake duration carefully
-   - Consider governance participation
-
-2. **Risk Management**
-   - Understand lock periods
-   - Diversify stake durations
-   - Keep reserve for emergencies
-
-3. **Optimization**
-   - Compound rewards regularly
-   - Time stakes with reward cycles
-   - Consider gas costs
-
-4. **Security**
-   - Verify transactions
-   - Use secure wallets
-   - Keep private keys safe 
+1. **Minimum Requirements**: Always stake at least 10 DUSD
+2. **Lock Period**: Plan for 30-day minimum lock duration
+3. **Reward Claims**: Claim rewards regularly to compound returns
+4. **Pool Limits**: Respect the 20,000 DUSD maximum per address
+5. **Bootstrap Phase**: Stake early for enhanced rewards 

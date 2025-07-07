@@ -1,6 +1,6 @@
 {
   "canisters": {
-    "sci_archive": {
+    "doxa-dev-docs": {
       "type": "assets",
       "source": [
         "public"

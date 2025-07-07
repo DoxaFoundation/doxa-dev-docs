@@ -1,138 +1,92 @@
 ---
 title: "Fee Collection"
 linkTitle: "Fee Collection"
-weight: 5
+weight: 6
 description: "Guide for fee structure and collection in the Doxa Protocol"
 ---
 
-This guide explains the fee structure and collection process in the Doxa Protocol.
+# Fee Collection
 
 ## Overview
 
-Doxa Protocol implements various fees to maintain system stability and incentivize participants. All fees are collected in USDx and distributed among stakeholders.
+Doxa Protocol implements a simple fee structure for swaps and protocol operations.
 
 ## Fee Structure
 
-### Transaction Fees
-```motoko
-// Base transaction fee
-public let BASE_FEE : Nat = 10_000; // 0.0001 USDx
-
-// Pool creation fee
-public let POOL_CREATION_FEE : Nat = 100_000_000; // 1 USDx
-
-// Approval fee
-public let APPROVAL_FEE : Nat = 10_000; // 0.0001 USDx
-```
+### Trading Fees
+- **Standard Swaps**: 0.3% (30 basis points)
+- **Stable Pairs**: 0.05% (5 basis points)
+- **Exotic Pairs**: 1% (100 basis points)
 
 ### Protocol Fees
+- **Minting DUSD**: No additional fee (1:1 with ckUSDC)
+- **Staking**: No deposit/withdrawal fees
+- **Token Transfers**: Standard ICRC-1 fees
 
-| Operation | Fee Amount | Description |
-|-----------|------------|-------------|
-| Pool Creation | 1 USDx | One-time fee for creating a new pool |
-| Swap | 0.3% | Fee on each swap transaction |
-| Mint | 0.1% | Fee for minting new USDx |
-| Burn | 0% | No fee for burning USDx |
-| Liquidation | 13% | Penalty fee on liquidated positions |
-
-## Fee Collection Mechanism
+## Fee Collection Process
 
 ### Swap Fees
 ```motoko
-public shared func collectSwapFee(
-    poolId: Principal,
-    amount: Nat
-) : async Result<(), Text> {
-    // Collection logic
-}
+// Fees automatically collected during swaps
+let swapAmount = 1_000_000; // 1 DUSD
+let feeAmount = swapAmount * 30 / 10000; // 0.3% fee
+let outputAmount = calculateSwapOutput(swapAmount - feeAmount);
 ```
 
-### Distribution Model
+### Staking Fees
 ```motoko
-type FeeDistribution = {
-    treasury: Nat = 50; // 50% to treasury
-    stakers: Nat = 30;  // 30% to stakers
-    lps: Nat = 20;      // 20% to liquidity providers
+// No fees for staking operations
+// Rewards distributed from protocol treasury
+let stakingReward = calculateReward(stakedAmount, duration, apy);
+```
+
+## Fee Distribution
+
+1. **Protocol Treasury**: 60% of collected fees
+2. **Liquidity Providers**: 30% of collected fees  
+3. **Staking Rewards**: 10% of collected fees
+
+## Integration
+
+### Calculate Trading Fees
+```motoko
+public func calculateTradingFee(amount: Nat, feeRate: Nat) : Nat {
+    amount * feeRate / 10000
+};
+
+// Example usage
+let tradeFee = calculateTradingFee(1_000_000, 30); // 0.3% of 1 DUSD
+```
+
+### Fee Queries
+```motoko
+// Get current fee rates
+public query func getFeeRates() : async {
+    standardSwap: Nat;
+    stablePair: Nat;
+    exoticPair: Nat;
+} {
+    {
+        standardSwap = 30; // 0.3%
+        stablePair = 5;    // 0.05%
+        exoticPair = 100;  // 1%
+    }
 };
 ```
 
-## Fee Management
+## Error Handling
 
-### Treasury Management
 ```motoko
-public shared ({ caller }) func withdrawTreasuryFees(
-    amount: Nat
-) : async Result<(), Text>
-```
-
-### Staker Rewards
-```motoko
-public func calculateStakerRewards(
-    stakeId: StakeId
-) : async Nat
-```
-
-### LP Fee Claims
-```motoko
-public shared ({ caller }) func claimLPFees(
-    poolId: Principal
-) : async Result<Nat, Text>
-```
-
-## Weekly Distribution
-
-### Schedule
-- Weekly fee distribution every Monday at 00:00 UTC
-- Automatic distribution to eligible participants
-- Manual claim required for LP fees
-
-### Distribution Flow
-1. Fees collected during the week
-2. Distribution calculation on Sunday
-3. Treasury allocation
-4. Staker rewards calculation
-5. LP share computation
-6. Distribution execution
-
-## Monitoring & Reporting
-
-### Fee Statistics
-```motoko
-public query func getFeeStats() : async {
-    totalCollected: Nat;
-    weeklyVolume: Nat;
-    distributionPending: Nat;
-}
-```
-
-### Historical Data
-```motoko
-public query func getFeeHistory(
-    startTime: Time,
-    endTime: Time
-) : async [FeeRecord]
+type FeeError = variant {
+    #InsufficientAmount;
+    #InvalidFeeRate;
+    #CollectionFailed;
+};
 ```
 
 ## Best Practices
 
-### For Users
-1. **Transaction Planning**
-   - Batch transactions to minimize fees
-   - Consider fee tiers for different operations
-   - Monitor gas prices for optimal timing
-
-2. **Fee Optimization**
-   - Use approved operators to save on approval fees
-   - Participate in fee sharing programs
-   - Stake tokens for fee discounts
-
-### For Developers
-1. **Integration Tips**
-   - Always include fee calculations
-   - Handle fee collection failures
-   - Implement proper fee accounting
-
-2. **Security Considerations**
-   - Verify fee calculations
-   - Implement fee limits
-   - Monitor for unusual patterns 
+1. **Fee Awareness**: Always account for fees in trade calculations
+2. **Slippage Tolerance**: Set appropriate slippage to cover fees
+3. **Route Optimization**: Choose optimal trading routes to minimize fees
+4. **Balance Management**: Maintain sufficient balance to cover fees 

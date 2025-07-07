@@ -1,84 +1,64 @@
 ---
 title: "Documentation"
-linkTitle: "Documentation"
+linkTitle: "Docs"
 weight: 20
-menu:
-  main:
-    weight: 20
+description: "Welcome to the Doxa Protocol Documentation"
 ---
 
-# Doxa Protocol Documentation
+# Welcome to Doxa Protocol Documentation
 
-Welcome to the Doxa Protocol documentation. This documentation will help you understand and integrate with our protocol.
+The Doxa Protocol is a stablecoin system built on the Internet Computer that provides DUSD (Doxa USD), a 1:1 ckUSDC-backed stablecoin with integrated staking and trading capabilities.
 
 ## Core Protocol Components
 
-### [Key Components](key-components/)
-Overview of core components that make up the Doxa Protocol:
-- Core System Architecture
-- Stablecoin Architecture
-- Chain Fusion Features
-- Security Features
+### 🪙 [DUSD Token Integration](dusd-token-integration/)
+Learn about DUSD, our ICRC-1 compliant stablecoin backed 1:1 by ckUSDC with 6 decimal precision.
 
-### [Pool Operations](pool-operations/)
-Guide for interacting with liquidity pools:
-- Pool Creation
-- Liquidity Management
-- Trading Operations
-- Position Management
+### 🏗️ [Key Components](key-components/)
+Understand the core architecture including the minter system, staking mechanism, and AMM trading.
 
-### [Staking Integration](staking-integration/)
-Documentation for staking system:
-- Staking Configuration
-- Reward Mechanisms
-- Governance Integration
-- Risk Management
+### 🏛️ [Architecture Overview](architecture-overview/)
+Deep dive into the technical architecture and inter-canister communication patterns.
 
-### [USDx Token Integration](usdx-token-integration/)
-Guide for USDx stablecoin integration:
-- ICRC-1 & ICRC-2 Standards
-- Token Operations
-- Price Feed Integration
-- Security Best Practices
+### 💰 [Staking Integration](staking-integration/)
+Explore the 20% APY staking system with 30-day lock periods and bootstrap rewards.
 
-### [Liquidity Management](liquidity-management/)
-Comprehensive guide for managing liquidity:
-- Position Management
-- Fee Collection
-- Risk Management
-- Analytics Tools
+### 🔄 [Pool Operations](pool-operations/)
+Learn about AMM-based token swaps and liquidity provision.
 
-### [Fee Collection](fee-collection/)
-Details about protocol fee structure:
-- Transaction Fees
-- Protocol Fees
-- Distribution Model
-- Weekly Rewards
-
-### [Transaction Monitoring](transaction-monitoring/)
-Guide for monitoring transactions:
-- Transaction Types
-- Real-time Monitoring
-- Analytics Tools
-- Integration Examples
-
-### [Statistics & Data](statistics/)
-Access to protocol statistics:
-- Protocol Metrics
-- Market Data
-- User Analytics
-- System Health
+### 💸 [Fee Collection](fee-collection/)
+Understanding the fee structure and distribution mechanisms.
 
 ## Getting Started
 
-1. Install IC SDK
-2. Set up your development environment
-3. Deploy your first canister
-4. Start building!
+### For Developers
+1. **[Integration Guide](integration-guide/)** - Complete guide for integrating with Doxa Protocol
+2. **[Users vs Developers Guide](user-developer-guide/)** - Understanding different access levels and capabilities
+
+### Monitoring & Analytics
+- **[Transaction Monitoring](transaction-monitoring/)** - Track DUSD transactions and activities
+- **[Statistics & Data](statistics/)** - Access protocol statistics and user analytics
+
+### Support & Security
+- **[Security Guide](security-guide/)** - Best practices and security implementation
+- **[Troubleshooting](troubleshooting/)** - Common issues and solutions
+
+## Quick Reference
+
+### Core Canister IDs
+- **DUSD Token**: `irorr-5aaaa-aaaak-qddsq-cai`
+- **Staking**: `mhahe-xqaaa-aaaag-qndha-cai`
+- **ckUSDC**: `xevnm-gaaaa-aaaar-qafnq-cai`
+
+### Key Parameters
+- **Minting Ratio**: 1:1 (1 ckUSDC = 1 DUSD)
+- **Minimum Deposit**: 1 ckUSDC
+- **Staking APY**: 20% base rate
+- **Lock Period**: 30 days minimum
+- **Minimum Stake**: 10 DUSD
 
 ## Additional Resources
 
-- [API Reference](/docs/api-reference)
-- [Guides](/docs/guides)
-- [Troubleshooting](/docs/troubleshooting)
-- [GitHub Repository](https://github.com/doxa-protocol/core) 
+- **[Internet Computer Documentation](https://internetcomputer.org/docs/current/home)**
+- **[Motoko Programming Language Book](https://internetcomputer.org/docs/current/motoko/main/motoko)**
+- **[ICRC-1 Token Standard](https://internetcomputer.org/docs/current/developer-docs/integrations/icrc-1/)** 
